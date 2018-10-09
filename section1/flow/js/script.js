@@ -1,49 +1,53 @@
 var chatModule = (function () {
 
     // Private scope
-    var leadself = 'Me: ',
-        leadcomputer = "PC: ",
-        aSaid = ["This is a Cyber Chat"],
-        msgYes = "Yes, that's a great idea.",
-        msgNo = "No, that must be a mistake.",
-        aSassyStuff = ["Like mold on books, grow myths on history.",
+    var _leadself = 'Me: ',
+        _leadcomputer = "PC: ",
+        _aSaid = ["This is a Cyber Chat"],
+        _msgYes = "Yes, that's a great idea.",
+        _msgNo = "No, that must be a mistake.",
+        _aSassyStuff = ["Like mold on books, grow myths on history.",
         "She moved like a poem and smiled like a sphinx.",
         "As long as we don’t die, this is gonna be one hell of a story.",
         "She laughed, and the desert sang.",
         "You’ve got about as much charm as a dead slug."];
 
-    function echo (message) {
-        aSaid.push('<div>' + message + '</div>');
+    function _echo (message) {
+        _aSaid.push('<div>' + message + '</div>');
 
-        var aSaidLength = aSaid.length,
+        var aSaidLength = _aSaid.length,
             start = Math.max(aSaidLength - 6,0),
             out = "";
         for(var i = start; i < aSaidLength; i++){
-            out += aSaid[i];
+            out += _aSaid[i];
         }
 
         $('.advert').html(out);
         $('#talk span').text(message);
     }
 
+    function talk(message) {
+        _echo(_leadself + message);
+    }
+
+    function replayYesNo () {
+        var msg = Math.random() > 0.5 ? _msgYes : _msgNo;
+        _echo(_leadcomputer + msg);
+    }
+
+    function saySassyStuff() {
+        var msg = Math.random() > 0.5 ? _msgYes : _msgNo;
+        _echo(_leadcomputer + msg);
+    }
+
     return {
-        talk: function(message) {
-            echo(leadself + message);
-        },
-
-        replayYesNo: function() {
-            var msg = Math.random() > 0.5 ? msgYes : msgNo;
-            echo(leadcomputer + msg);
-        },
-
-        saySassyStuff: function () {
-            var msg = Math.random() > 0.5 ? msgYes : msgNo;
-            echo(leadcomputer + msg);
-        },
+        talk: talk,
+        replayYesNo: replayYesNo,
+        saySassyStuff: saySassyStuff,
     };
 })();
 
-$(doc).ready(function(){
+$(document).ready(function(){
     chatModule.talk("this is great");
     chatModule.replayYesNo();
     chatModule.saySassyStuff();
