@@ -59,78 +59,78 @@
             console.log('this.register this.types: ', this.types);
         }
     };
-	
-	var CircleGeneratorSingleton = (function () {
 
-		var instance;
+    var CircleGeneratorSingleton = (function () {
 
-		function init() {
-			var _aCircle = [],
+        var instance;
+
+        function init() {
+            var _aCircle = [],
                 _stage = $('.advert');
-			// Reference to the Factory
+            // Reference to the Factory
             var _cf = new CircleFactory();
             // Register items in the factory
             _cf.register('red', RedCircleBuilder);
             _cf.register('cornflowerblue', BlueCircleBuilder);
 
-			function _position(circle, left, top) {
+            function _position(circle, left, top) {
                 circle.move(left, top);
             }
-			
-			function create(left, top, type) {
-			    // Ask Factory to create a circle
+
+            function create(left, top, type) {
+                // Ask Factory to create a circle
                 var circle = _cf.create(type).get();
                 _position(circle, left, top);
                 return circle;
             }
 
             function add(circle) {
-				_stage.append(circle.get());
-				_aCircle.push(circle);
-            }
-            
-            function index() {
-				return _aCircle.length;
+                _stage.append(circle.get());
+                _aCircle.push(circle);
             }
 
-			return {
-                create: create,
-				add: add,
-				index: index,
-			};
-        }
-        
-        return {
-			getInstance: function () {
-				if (!instance) {
-					instance = init();
-				}
-				return instance;
+            function index() {
+                return _aCircle.length;
             }
-		}
+
+            return {
+                create: create,
+                add: add,
+                index: index,
+            };
+        }
+
+        return {
+            getInstance: function () {
+                if (!instance) {
+                    instance = init();
+                }
+                return instance;
+            }
+        }
 
     })();
 
-	$(win.document).ready(function(){
-		$('.advert').click(function(e){
-			var cg = CircleGeneratorSingleton.getInstance();
-			var circle = cg.create(e.pageX-25, e.pageY-25, "red");
-			cg.add(circle);
-		});
+    $(win.document).ready(function(){
+        $('.advert').click(function(e){
+            var cg = CircleGeneratorSingleton.getInstance();
+            var circle = cg.create(e.pageX-25, e.pageY-25, "red");
+            cg.add(circle);
+        });
 
         $(document).keypress(function(e){
             if(e.key=='a'){
                 var cg = CircleGeneratorSingleton.getInstance();
                 var circle = cg.create(
-                	Math.floor(Math.random()*600),
+                    Math.floor(Math.random()*600),
                     Math.floor(Math.random()*600),
                     "cornflowerblue"
-				);
+                );
 
                 cg.add(circle);
             }
         });
 
-	});
+    });
 
 })(window, jQuery);
