@@ -11,40 +11,52 @@
     Circle.prototype.color = function (color) {
         this.item.css("background", color);
     }
-    
-    
-    
-    function RedCircle() {
-        
-    }
-    RedCircle.prototype.create = function () {
-        this.item = $('<div class="circle"></div>');
-        return this;
+    Circle.prototype.get = function () {
+        return this.item;
     }
 
-    function BlueCircle() {
 
+    // Builder
+    function RedCircleBuilder() {
+        // creation
+        this.item = new Circle();
+        this.init();
     }
-    BlueCircle.prototype.create = function () {
-        this.item = $('<div class="circle" style="background: cornflowerblue;"></div>');
-        return this;
+    RedCircleBuilder.prototype.init = function () {
+        // NOTHING
+    }
+    RedCircleBuilder.prototype.get = function () {
+        return this.item;
+    }
+
+    function BlueCircleBuilder() {
+        this.item = new Circle();
+        this.init();
+    }
+    BlueCircleBuilder.prototype.init = function () {
+        this.item.color("cornflowerblue");
     };
+    BlueCircleBuilder.prototype.get = function () {
+        return this.item;
+    }
 
     var CircleFactory = function () {
 
         // store for types
         this.types = {};
         this.create = function (type) {
-            return new this.types[type]().create();
+            return new this.types[type]().get();
         };
 
-        this.register = function (type, classPrototype) {
+        // Register builders
+        this.register = function (type, constructorName) {
             // Some kind of interface - checking if this object is what we expecting
-            if (classPrototype.prototype.create) {
-                this.types[type] = classPrototype;
+            if (constructorName.prototype.init && constructorName.prototype.get) {
+                this.types[type] = constructorName;
             } else {
-                throw new Error('classPrototype of ' + classPrototype + ' does not have create method');
+                throw new Error('classPrototype of ' + constructorName + ' does not have create method');
             }
+            console.log('this.register this.types: ', this.types);
         }
     };
 	
@@ -58,18 +70,17 @@
 			// Reference to the Factory
             var _cf = new CircleFactory();
             // Register items in the factory
-            _cf.register('red', RedCircle);
-            _cf.register('cornflowerblue', BlueCircle);
+            _cf.register('red', RedCircleBuilder);
+            _cf.register('cornflowerblue', BlueCircleBuilder);
 
 			function _position(circle, left, top) {
-                circle.css('left', left);
-                circle.css('top', top);
+                circle.move(left, top);
             }
 			
 			function create(left, top, type) {
 			    // Ask Factory to create a circle
-                var circle = _cf.create(type).item;
-                _position(circle, left, top);
+                var circle = _cf.create(type);
+                circle.move(left, top);
                 return circle;
             }
 
