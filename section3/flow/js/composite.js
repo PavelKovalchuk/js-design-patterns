@@ -74,8 +74,6 @@
 	function StageAdapter(id) {
 		this.index = 0;
 		this.context = $(id);
-        console.log('StageAdapter Constructor this.index', this.index);
-        console.log('StageAdapter Constructor this.context', this.context);
     }
     // Unique signature
     StageAdapter.prototype.SIG = 'stageItem_';
@@ -85,11 +83,23 @@
 		// Unique id of each item
 		item.addClass(this.SIG + this.index);
 		this.context.append(item);
-		console.log('StageAdapter add this.index', this.index);
-        console.log('StageAdapter add this.context', this.context);
     };
     StageAdapter.prototype.remove = function (index) {
 		this.context.remove('.' + this.SIG + index);
+    };
+
+    function CompositeController(a) {
+		this.a = a;
+    };
+    CompositeController.prototype.action = function (act) {
+		var args = Array.prototype.slice.call(arguments);
+
+		//get rid off of act in args
+		args.shift();
+
+    	for(var item in this.a) {
+			this.a[item][act].apply(this.a[item], args);
+		}
     };
 
 	var CircleGeneratorSingleton = (function(){
@@ -98,7 +108,8 @@
 		function init(){
 			var _aCircle = [],
                 _stage,
-                _sf	 = new ShapeFactory();
+                _sf	 = new ShapeFactory(),
+				_cc = new CompositeController(_aCircle);
 
             function _position(circle, left, top){
                 circle.move(left, top);
@@ -117,6 +128,15 @@
                 circle.move(left, top);
                 return circle;
             }
+            
+            function tint(clr) {
+				_cc.action('color', clr);
+            }
+            
+            function move(left, top) {
+            	console.log('move works');
+                _cc.action('move', left, top);
+            }
 
             function add(circle){
                 _stage.add(circle.get());
@@ -133,6 +153,8 @@
                 add:add,
                 register: registerShape,
                 setStage: setStage,
+				tint: tint,
+				move: move,
             };
 		}
 
@@ -160,14 +182,21 @@
 		});
 
 		$(document).keypress(function(e){
-			if(e.key=='a'){
+
+			if(e.key ==='a'){
 				var circle = cg.create(
 					Math.floor(Math.random()*600),
                     Math.floor(Math.random()*600),
                     "blue"
 				);
 				cg.add(circle);
-			}
+			} else if (e.key ==='t') {
+				cg.tint('black');
+			} else if (e.key ==='r') {
+                cg.move("+=5px", "+=0px");
+            } else if (e.key ==='l') {
+                cg.move("-=5px", "+=0px");
+            }
 			
 		});
 
