@@ -7,16 +7,7 @@
 	function Circle(){
 		
 		this.item = $('<div class="circle"></div>');
-		var self = this;
-		this.opacity = 1;
 
-		this.fade=function(){
-			this.opacity *=.5;
-			this.item.fadeTo(.5,this.opacity);
-		}
-		this.item.click(function(){
-			self.fade();
-		});
 	}
 	Circle.prototype.color = function(clr){
 		this.item.css('background', clr);
@@ -119,6 +110,12 @@
 		}
 	};
 
+	function flyWeightFader(item) {
+		if (item.hasClass('circle')) {
+			item.fadeTo(0.5, item.css('opacity') * 0.5);
+		}
+    }
+
 
 	var CircleGeneratorSingleton = (function(){
 		var instance;
@@ -192,6 +189,8 @@
 			var circle = cg.create(e.pageX-25, e.pageY-25,"red");
 
 			cg.add(circle);
+
+			flyWeightFader($(e.target));
 				
 		});
 
@@ -204,9 +203,9 @@
 				cg.add(circle);
 			}else if(e.key==='t'){
 				cg.tint('black');
-			}else if(e.key==='ArrowRight'){
+			}else if(e.key==='l'){
 				cg.move("+=5px","+=0px");
-			}else if(e.key==='ArrowLeft'){
+			}else if(e.key==='r'){
 				cg.move("-=5px","+=0px");
 			}
 			
