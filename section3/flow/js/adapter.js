@@ -71,6 +71,26 @@
         }
 	};
 
+	function StageAdapter(id) {
+		this.index = 0;
+		this.context = $(id);
+        console.log('StageAdapter Constructor this.index', this.index);
+        console.log('StageAdapter Constructor this.context', this.context);
+    }
+    // Unique signature
+    StageAdapter.prototype.SIG = 'stageItem_';
+	// Adding needed implementation of the method
+    StageAdapter.prototype.add = function (item) {
+		++this.index;
+		// Unique id of each item
+		item.addClass(this.SIG + this.index);
+		this.context.append(item);
+		console.log('StageAdapter add this.index', this.index);
+        console.log('StageAdapter add this.context', this.context);
+    };
+    StageAdapter.prototype.remove = function (index) {
+		this.context.remove('.' + this.SIG + index);
+    };
 
 	var CircleGeneratorSingleton = (function(){
 		var instance;
@@ -99,7 +119,7 @@
             }
 
             function add(circle){
-                _stage.append(circle.get());
+                _stage.add(circle.get());
                 _aCircle.push(circle);
             }
 
@@ -132,7 +152,7 @@
         var cg = CircleGeneratorSingleton.getInstance();
         cg.register('red', RedCircleBuilder);
         cg.register('blue', BlueCircleBuilder);
-        cg.setStage($('.advert'));
+        cg.setStage(new StageAdapter('.advert'));
 		$('.advert').click(function(e){
 			var circle = cg.create(e.pageX-25, e.pageY-25,"red");
 			cg.add(circle);
