@@ -12,8 +12,8 @@
 	}
 	
 	Circle.prototype.move = function(left, top){
-				this.item.css('left',left);
-				this.item.css('top',top);
+        this.item.css('left',left);
+        this.item.css('top',top);
 	};
 
 	Circle.prototype.get = function(){
@@ -58,17 +58,17 @@
 	};
 	
 
-	CircleFactory = function(){
-			this.types = {};
-			this.create = function(type){
-				return new this.types[type]().get();
-			};
+	ShapeFactory = function(){
+        this.types = {};
+        this.create = function(type){
+            return new this.types[type]().get();
+        };
 
-			this.register = function(type, cls){
-				if(cls.prototype.init && cls.prototype.get){
-						this.types[type] = cls;
-				}
-			}
+        this.register = function(type, cls){
+            if(cls.prototype.init && cls.prototype.get){
+                this.types[type] = cls;
+            }
+        }
 	};
 
 
@@ -77,33 +77,43 @@
 
 		function init(){
 			var _aCircle = [],
-					_stage = $('.advert'),
-					_cf = new CircleFactory();
-					_cf.register('red', RedCircleBuilder);
-					_cf.register('blue', BlueCircleBuilder);
+                _stage,
+                _sf	 = new ShapeFactory();
 
-			function _position(circle, left, top){
-				circle.move(left, top);
-			}
+            function _position(circle, left, top){
+                circle.move(left, top);
+            }
 
-			function create(left, top,type){
-				var circle = _cf.create(type);
-				circle.move(left, top);
-				return circle;
-			}
+            function registerShape(name, cls) {
+                _sf.register(name, cls);
+            }
 
-			function add(circle){
-				_stage.append(circle.get());
-				_aCircle.push(circle);
-			}
+            function setStage(stg) {
+                _stage = stg;
+            }
 
-			function index(){
-				return _aCircle.length;
-			}
+            function create(left, top,type){
+                var circle = _sf.create(type);
+                circle.move(left, top);
+                return circle;
+            }
 
-			return {index:index,
-							create:create,
-							add:add};
+            function add(circle){
+                _stage.append(circle.get());
+                _aCircle.push(circle);
+            }
+
+            function index(){
+                return _aCircle.length;
+            }
+
+            return {
+                index:index,
+                create:create,
+                add:add,
+                register: registerShape,
+                setStage: setStage,
+            };
 		}
 
 		return {
@@ -119,21 +129,23 @@
 	})();
 
 	$(win.document).ready(function(){
+        var cg = CircleGeneratorSingleton.getInstance();
+        cg.register('red', RedCircleBuilder);
+        cg.register('blue', BlueCircleBuilder);
+        cg.setStage($('.advert'));
 		$('.advert').click(function(e){
-			var cg = CircleGeneratorSingleton.getInstance();
 			var circle = cg.create(e.pageX-25, e.pageY-25,"red");
-
 			cg.add(circle);
 				
 		});
 
 		$(document).keypress(function(e){
 			if(e.key=='a'){
-				var cg = CircleGeneratorSingleton.getInstance();
-				var circle = cg.create(Math.floor(Math.random()*600),
-															Math.floor(Math.random()*600),
-															"blue");
-				
+				var circle = cg.create(
+					Math.floor(Math.random()*600),
+                    Math.floor(Math.random()*600),
+                    "blue"
+				);
 				cg.add(circle);
 			}
 			
