@@ -77,6 +77,58 @@
 		};
 	}
 
+	function eventDispatcherDecorator(obj) {
+
+		var list = {};
+		obj.addEvent = function (type, listener) {
+			if (!list[type]) {
+                list[type] = [];
+			}
+			if (list[type].indexOf(listener) === -1) {
+                list[type].push(listener);
+			}
+        };
+		obj.removeEvent = function (type, listener) {
+			var listArr = list[type];
+			if (listArr) {
+				var index = listArr.indexOf(listener);
+				if (index > -1) {
+					listArr.splice(index, 1);
+				}
+			}
+        };
+		obj.dispatchEvent = function (event) {
+			console.log('dispatchEvent list', list);
+			var aList = list[event.type];
+			if (aList) {
+				if (!event.target) {
+					event.target = this;
+				}
+				for (var index in aList) {
+					aList[index](event);
+				}
+			}
+        }
+
+    }
+    var obj = {};
+	var fun = function (event) {
+        console.log('fun: event: ', event);
+        console.log('it is completely over!');
+    };
+    var fun2 = function () {
+        console.log('it is 2 completely over!');
+    };
+	eventDispatcherDecorator(obj);
+	obj.addEvent('over', function () {
+		console.log('it is over!');
+    });
+    obj.addEvent('over', fun);
+    obj.addEvent('over', fun2);
+    obj.removeEvent('over', fun2);
+
+	obj.dispatchEvent({type: 'over'});
+
 
 	function RedCircleBuilder(){
 		this.item = new Circle();
