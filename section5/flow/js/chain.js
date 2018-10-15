@@ -29,6 +29,23 @@
     Circle.prototype.setID = function(id){
         this.id = id;
     };
+    
+    Circle.prototype.next = function (shp) {
+		if (shp) {
+			this.nextShape = shp;
+		}
+		return this.nextShape;
+    }
+    
+    Circle.prototype.chainDo = function (action, args, count) {
+		this[action].apply(this, args);
+
+		if(count && this.nextShape) {
+			setTimeout(binderProxy(this, function () {
+                this.nextShape.chainDo(action, args, --count);
+            }), 20);
+		}
+    }
 
 	function Rect(){
 		this.item = $('<div class="rect"></div>');
@@ -162,12 +179,26 @@
 
 			function create(left, top,type){
 				var circle = _sf.create(type);
+				var index = _aCircle.length - 1;
 				circle.move(left, top);
                 circle.setID(_aCircle.length);
                 _aCircle.push(circle);
 
+                if (index !== -1) {
+                	_aCircle[index].next(circle);
+				}
+
 				return shapeFacade(circle);
 			}
+			
+			function chainTint(count) {
+				var index = Math.max(0, _aCircle.length - count);
+				var clr = "#" +
+							Math.floor(Math.random() * 255).toString(16)
+							+ Math.floor(Math.random() * 255).toString(16)
+							+ Math.floor(Math.random() * 255).toString(16);
+				_aCircle[index].chainDo('color', [clr], count);
+            }
 
 			function tint(clr){
 				_cc.action('color',clr);
@@ -185,13 +216,16 @@
 				return _aCircle.length;
 			}
 
-			return {index:index,
-							create:create,
-							add:add,
-							register:registerShape,
-							setStage:setStage,
-							tint:tint,
-							move:move};
+			return {
+				index:index,
+                create:create,
+                add:add,
+                register:registerShape,
+                setStage:setStage,
+                tint:tint,
+                move:move,
+                chainTint:chainTint,
+			};
 		}
 
 		return {
@@ -215,6 +249,7 @@
 			var circle = cg.create(e.pageX-25, e.pageY-25,"red");
 
 			cg.add(circle);
+			cg.chainTint(5);
 
 			flyWeightFader($(e.target));
 				
