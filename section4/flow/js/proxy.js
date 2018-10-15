@@ -35,17 +35,19 @@
 	}
 	clone(Circle, Rect);
 	
+	function binderProxy(scope, fun) {
+		return function () {
+			// arguments are the parameters of returned function
+			return fun.apply(scope, arguments);
+        }
+    }
+	
 	function shapeFacade(shp) {
 		return {
-			color: function (clr) {
-				shp.color(clr);
-            },
-			move: function (x, y) {
-				shp.move(x, y);
-            },
-            getID: function (x, y) {
-                return shp.getID();
-            },
+			color: binderProxy(shp, shp.color),
+			move: binderProxy(shp, shp.move),
+			// shp is a scope
+            getID: binderProxy(shp, shp.getID),
 		};
     }
 
