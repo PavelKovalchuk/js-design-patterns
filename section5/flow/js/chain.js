@@ -43,7 +43,7 @@
 		if(count && this.nextShape) {
 			setTimeout(binderProxy(this, function () {
                 this.nextShape.chainDo(action, args, --count);
-            }), 20);
+            }), 100);
 		}
     }
 
